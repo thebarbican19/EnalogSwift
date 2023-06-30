@@ -6,20 +6,20 @@
 
 import Foundation
 
-enum EnalogErrors {
+public enum EnalogErrors {
     case none
     case fatal
     case log
     
 }
 
-struct EnalogResponse:Codable {
+public struct EnalogResponse:Codable {
     var detail:String?
     var id:String?
     
 }
 
-struct EnalogEncodableValue: Encodable {
+public struct EnalogEncodableValue: Encodable {
     let value: Encodable
     
     func encode(to encoder: Encoder) throws {
@@ -35,7 +35,7 @@ struct EnalogEncodableValue: Encodable {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-class EnalogManager {
+public class EnalogManager {
     static var main = EnalogManager()
     
     private var debugger:Bool = false
