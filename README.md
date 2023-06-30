@@ -40,14 +40,42 @@ EnalogManager.main.user(user.id, name: user.name, email: user.email, metadata: u
 <h3>Tracking Events</h3>
 Creating & Tracking events can be achieved by calling the <code>EnalogManager.main.ingest()</code> function. This function takes the following parameters...
 <br/><br/>
-<li><strong>Event ID</strong> (String)</li>
+<li><strong>Event ID</strong> (Enum)</li>
 <li><strong>Description</strong> (String)</li>
-<li><strong>Metadata</strong> (AnyObject)</li>
 <li><strong>Tags</strong> (Array<String>)</li>
+<li><strong>Metadata</strong> (AnyObject)</li>
 
+<br/><br/>
+First, you must create an <strong>Enum</strong> with all your Event ID's. This can be named anything. 
+
+```
+enum EnalogEvents:String {
+    case myNewEvent = "new.event"
+    case fatalErrors = "fatal.error"
+    case purchaseEvent = "purchase.event"
+
+}
+```
+
+<p>Once you have added this, you can call</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description")</code>
   <br/><br/>
+<p>Additionally, you can add <strong>Tags</strong> by calling</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description", tags:["My Tag 1", "My Tag 2"])</code>
+ <br/><br/>
+<p>And like when specifying <strong>User Metadata</strong>, you can specify additional Metadata with <strong>AnyObject</strong> the conforms to the codable protocol.</p>
+<pre>
+struct PurchaseEvent:Codable {
+    let product:String
+    let cost:Double
+	
+}
+
+let product:PurchaseEvent = .init(product:"SprintDock License", cost:95.00)
+
+EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was purchased", metadata:product)</pre>
+
+<br/><br/>
 <h3>Logging & Debugging</h3>
-Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
+<p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
 <p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production</strong></p>
 <br/><br/>
 
