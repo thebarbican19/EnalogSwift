@@ -84,8 +84,7 @@ class EnalogManager {
 
     }
 
-    public func ingest(_ name:String, description:String, metadata:AnyObject? = nil, tags:[String]? = nil) {
-        
+    public func ingest<T: RawRepresentable>(_ event: T, description: String, metadata: AnyObject? = nil, tags: [String]? = nil) where T.RawValue == String {        
         var payload = Dictionary<String, EnalogEncodableValue>()
         payload["name"] = EnalogEncodableValue(name)
         payload["description"] = EnalogEncodableValue(description)
