@@ -9,8 +9,8 @@ Enalog for Swift is the Unofficial Swift Package made by <a href="https://twitte
 <br/><br/>
 <h3>Introduction</h3>
 <p>EnalogSwift requires an Enalog Account and an <strong>API Key</strong> which can all be created for free <a href="https://dash.enalog.app/organisation">here</a>.</p>
-<p>Once you have obtained an <strong>API Key</strong> and created a project in the Enalog Dashboard, you then you specify these in the <code>info.plist</code> in your Swift application.</p>
-<p>To paste this directly in to the <code>info.plist</code> right click on the <code>info.plist</code> file in Xcode and choose <strong>Open As > Source Code</strong></p>
+<p>Once you have obtained an <strong>API Key</strong> and created a project in the Enalog Dashboard, you must specify these in the <code>info.plist</code> in your Swift application.</p>
+<p>To paste this directly into the <code>info.plist</code> right-click on the <code>info.plist</code> file in Xcode and choose <strong>Open As > Source Code</strong></p>
 
 ```
 <key>EN_PROJECT_NAME</key>
