@@ -22,7 +22,7 @@ public struct EnalogResponse:Codable {
 public struct EnalogEncodableValue: Encodable {
     let value: Encodable
     
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         try value.encode(to: encoder)
         
     }
