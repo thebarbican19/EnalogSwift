@@ -1,6 +1,7 @@
 <h1>EnalogSwift</h1>
 Enalog for Swift is the Unofficial Swift Package made by <a href="https://twitter.com/mistermeenr">Joe Barbour</a> in collaboration with <a href="https://enalog.app/">Enalog & Enteka Software</a>.
 
+<br/><br/>
 <h3>Getting Started</h3>
 <p>You can add this package to your project using Swift Package Manager. Enter the following url when adding it to your project package dependencies:</p>
 
@@ -57,9 +58,9 @@ enum EnalogEvents:String {
 }
 ```
 
-<p>Once you have added this, you can call</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description")</code>
+<p>Once you have added this, you can call...</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description")</code>
   <br/><br/>
-<p>Additionally, you can add <strong>Tags</strong> by calling</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description", tags:["My Tag 1", "My Tag 2"])</code>
+<p>Additionally, you can add <strong>Tags</strong> by calling...</p> <code>EnalogManager.main.ingest(EnalogEvents.myNewEvent, description:"This is a description", tags:["My Tag 1", "My Tag 2"])</code>
  <br/><br/>
 <p>And like when specifying <strong>User Metadata</strong>, you can specify additional Metadata with <strong>AnyObject</strong> the conforms to the codable protocol.</p>
 <pre>
@@ -78,5 +79,7 @@ EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was
 <p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
 <p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production</strong></p>
 <br/><br/>
+
+<strong>Enalog</strong> also has official Libraries in <a href="https://docs.enalog.app/packages/python">Python</a> <a href="https://docs.enalog.app/packages/node-js">Node.js</a> & <a href="https://docs.enalog.app/packages/go">Go</a>. For more information, visit the <a href="https://docs.enalog.app/">official documentation</a>.
 
 
