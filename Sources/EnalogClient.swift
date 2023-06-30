@@ -36,7 +36,7 @@ public struct EnalogEncodableValue: Encodable {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 public class EnalogManager {
-    static var main = EnalogManager()
+    public static let main = EnalogManager()
     
     private var debugger:Bool = false
     private var fatal:EnalogErrors = .none
