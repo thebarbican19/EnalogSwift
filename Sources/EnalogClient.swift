@@ -154,7 +154,7 @@ public class EnalogManager {
     }
     
     private func enalogCallback(object:Dictionary<String,EnalogEncodableValue>) async {
-        if let endpoint = URL(string: "https://api.enalog.app/v1/events") {
+        if let endpoint = URL(string: "https://api.enalog.app/v1/events"), let appkey = EnalogManager.key {
             do {
                 let payload = try JSONEncoder().encode(object)
 
@@ -162,7 +162,7 @@ public class EnalogManager {
                 request.httpMethod = "POST"
                 request.httpBody = payload
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("Bearer \(EnalogManager.key)", forHTTPHeaderField: "Authorization")
+                request.addValue("Bearer \(appkey)", forHTTPHeaderField: "Authorization")
                 
                 if self.debugger {
                     print("\n\n✅ Enalog Client - Payload Sent:" ,String(decoding: payload, as: UTF8.self))
