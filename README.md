@@ -18,6 +18,9 @@ Enalog for Swift is the Unofficial Swift Package made by <a href="https://twitte
 <key>EN_API_KEY</key>
 <string>$(SD_ENALOG_KEY)</string>
 ```
+
+<br/>
+Declare the Library <code>import EnalogClient</code>
 	
 <br/><br/>
 <h3>User Metadata</h3>
