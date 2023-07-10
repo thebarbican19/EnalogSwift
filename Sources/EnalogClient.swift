@@ -62,16 +62,16 @@ public class EnalogManager {
     
     public func user(_ id:String, name:String? = nil, email:String? = nil, metadata:AnyObject? = nil) {
         if let name = name {
-            self.user["name"] = name
+            self.user["Name"] = name
 
         }
         
         if let email = email {
-            self.user["email"] = email
+            self.user["Email"] = email
 
         }
         
-        self.user["user_id"] = id
+        self.user["UserID"] = id
         
         if let metadata = metadata as? Codable {
             do {
@@ -108,6 +108,11 @@ public class EnalogManager {
         if let project = self.enalogProject {
             payload["project"] = EnalogEncodableValue(project)
 
+        }
+        
+        if let user = self.user["UserID"] {
+            payload["user_id"] = EnalogEncodableValue(user)
+            
         }
         
         if let metadata = metadata {
