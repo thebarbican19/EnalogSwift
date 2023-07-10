@@ -38,6 +38,17 @@ public struct EnalogEncodableValue: Encodable {
 public class EnalogManager {
     public static let main = EnalogManager()
     
+    public static var key:String? {
+        if let appkey = Bundle.main.infoDictionary?["EN_API_KEY"] as? String  {
+
+            return appkey
+            
+        }
+        
+        return nil
+        
+    }
+
     private var debugger:Bool = false
     private var fatal:EnalogErrors = .none
     private var user = Dictionary<String,Encodable>()
@@ -51,16 +62,16 @@ public class EnalogManager {
     
     public func user(_ id:String, name:String? = nil, email:String? = nil, metadata:AnyObject? = nil) {
         if let name = name {
-            self.user["Name"] = name
+            self.user["name"] = name
 
         }
         
         if let email = email {
-            self.user["Email"] = email
+            self.user["email"] = email
 
         }
         
-        self.user["UserID"] = id
+        self.user["user_id"] = id
         
         if let metadata = metadata as? Codable {
             do {
@@ -68,7 +79,7 @@ public class EnalogManager {
                 
                 if let dictionary = try? JSONSerialization.jsonObject(with: json, options: []) as? [String: Encodable] {
                     for (key, value) in dictionary {
-                        self.user[key.capitalized] = value
+                        self.user[key.lowercased()] = value
                         
                     }
                     
@@ -142,24 +153,8 @@ public class EnalogManager {
         
     }
     
-    private var enalogKey:String? {
-        if let appkey = Bundle.main.infoDictionary?["EN_API_KEY"] as? String  {
-            self.enalogLog("enalog is READY!", status: 200)
-
-            return appkey
-            
-        }
-        else {
-            self.enalogLog("enalog (EN_APP_KEY) is Missing from info.plist.", status: 422)
-            
-        }
-        
-        return nil
-        
-    }
-    
     private func enalogCallback(object:Dictionary<String,EnalogEncodableValue>) async {
-        if let endpoint = URL(string: "https://api.enalog.app/v1/events"), let key = self.enalogKey {
+        if let endpoint = URL(string: "https://api.enalog.app/v1/events") {
             do {
                 let payload = try JSONEncoder().encode(object)
 
@@ -167,7 +162,7 @@ public class EnalogManager {
                 request.httpMethod = "POST"
                 request.httpBody = payload
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+                request.addValue("Bearer \(EnalogManager.key)", forHTTPHeaderField: "Authorization")
                 
                 if self.debugger {
                     print("\n\n✅ Enalog Client - Payload Sent:" ,String(decoding: payload, as: UTF8.self))
