@@ -77,7 +77,6 @@ public class EnalogManager {
     
     public static var key:String? {
         if let appkey = Bundle.main.infoDictionary?["EN_API_KEY"] as? String  {
-            
             return appkey
             
         }
@@ -86,13 +85,14 @@ public class EnalogManager {
         
     }
     
-    private var debugger:Bool = false
     private var fatal:EnalogErrors = .none
-    private var user = Dictionary<String,Encodable>()
     private var project:String?
     private var requests:Int = 0
     private var throttle:Int = 10
-    private var enviroment:EnalogEnviroment = .production
+    
+    public var debugger:Bool = false
+    public var user = Dictionary<String,Encodable>()
+    public var enviroment:EnalogEnviroment = .production
     
     init() {
         Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
@@ -157,7 +157,7 @@ public class EnalogManager {
         payload["description"] = EnalogEncodableValue(description)
         
         if let tags = tags {
-            payload["tags"] = EnalogEncodableValue(tags)
+            payload["tags"] = EnalogEncodableValue(self.enaglogTagsMerge(tags))
             
         }
         
@@ -259,9 +259,7 @@ public class EnalogManager {
                                 self.enviroment = enviroment
 
                             }
-                            
-                            print("Enalog Test" ,object)
-                            
+                                                        
                         }
                         
                     }
