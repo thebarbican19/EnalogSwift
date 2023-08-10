@@ -189,7 +189,7 @@ public class EnalogManager {
         
         let unmuted = payload
         
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, *) {
             Task(priority: .background) {
                 await self.enalogCallback(object: unmuted)
                 
