@@ -78,9 +78,17 @@ let product:PurchaseEvent = .init(product:"SprintDock License", cost:95.00)
 EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was purchased", metadata:product)</pre>
 
 <br/><br/>
+<h3>Throttling</h3>
+<p>Throttling stops duplicate ingests and unnecessary requests to the server. By default, this is set to **10 requests per minute**.</p>
+<p>This limit can be changed by passing an <code>Int</code> the <code>throttle</code> function</p> 
+<code>EnalogManager.main.throttle(perMinute: 0)</code>
+<br/><br/>
+<strong>This limit is capped at 20 ingest requests per second.</strong>
+
+<br/><br/>
 <h3>Logging & Debugging</h3>
 <p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
-<p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production</strong></p>
+<p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production.</strong></p>
 <br/><br/>
 
 <strong>Enalog</strong> also has official Libraries in <a href="https://docs.enalog.app/packages/python">Python</a> <a href="https://docs.enalog.app/packages/node-js">Node.js</a> & <a href="https://docs.enalog.app/packages/go">Go</a>. For more information, visit the <a href="https://docs.enalog.app/">official documentation</a>.
