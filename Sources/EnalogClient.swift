@@ -325,7 +325,7 @@ public class EnalogManager {
         var payload = Dictionary<String,Encodable>()
 
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            payload["Version"] = version
+            payload["Version"] = "v\(version)"
 
         }
         
@@ -343,10 +343,20 @@ public class EnalogManager {
             #endif
         #endif
         
-        payload["Theme"] = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+        if (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Light" {
+            payload["Theme"] = "Light Mode"
+            
+        }
+        else {
+            payload["Theme"] = "Dark Mode"
+
+        }
         
-        print("Tags: " ,payload)
-        
+        if let locale = Locale.current.regionCode?.uppercased() {
+            payload["Locale"] = locale
+
+        }
+
         return payload
         
     }
