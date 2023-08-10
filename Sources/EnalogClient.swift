@@ -53,13 +53,31 @@ public class EnalogManager {
     private var fatal:EnalogErrors = .none
     private var user = Dictionary<String,Encodable>()
     private var project:String?
+    private var requests:Int = 0
+    private var throttle:Int = 10
 
+    init() {
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            self.requests = 0
+            
+        }
+        
+    }
+    
     public func debug(_ enabled:Bool, logType:EnalogErrors = .log) {
         self.debugger = enabled
         self.fatal = logType
         
     }
     
+    public func throttle(perMinute limit:Int) {
+        if limit <= 20 {
+            self.throttle = limit
+
+        }
+        
+    }
+
     public func user(_ id:String, name:String? = nil, email:String? = nil, metadata:AnyObject? = nil) {
         if let name = name {
             self.user["Name"] = name
@@ -137,7 +155,7 @@ public class EnalogManager {
             await self.enalogCallback(object: unmuted)
             
         }
-        
+            
     }
     
     private var enalogProject:String? {
@@ -159,47 +177,56 @@ public class EnalogManager {
     }
     
     private func enalogCallback(object:Dictionary<String,EnalogEncodableValue>) async {
-        if let endpoint = URL(string: "https://api.enalog.app/v1/events"), let appkey = EnalogManager.key {
-            do {
-                let payload = try JSONEncoder().encode(object)
-
-                var request = URLRequest(url: endpoint, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 60)
-                request.httpMethod = "POST"
-                request.httpBody = payload
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("Bearer \(appkey)", forHTTPHeaderField: "Authorization")
-                
-                if self.debugger {
-                    print("\n\n✅ Enalog Client - Payload Sent:" ,String(decoding: payload, as: UTF8.self))
-                    
-                }
-                
+        if self.requests < self.throttle {
+            if let endpoint = URL(string: "https://api.enalog.app/v1/events"), let appkey = EnalogManager.key {
                 do {
-                    let (data, response) = try await URLSession.shared.data(for: request)
-                    let object = try? JSONDecoder().decode(EnalogResponse.self, from: data)
-                                        
-                    if let status = response as? HTTPURLResponse {
-                        switch status.statusCode {
-                            case 200 : self.enalogLog("Enalog Ingest Stored", status: status.statusCode)
-                            case 401 : self.enalogLog("Enalog Authorization Error: API Key is Invalid", status: status.statusCode)
-                            case 404 : self.enalogLog("Enalog Project '\(self.project ?? "")' does not exist. This can be specified by setting the  'EN_PROJECT_NAME' value in the info.plist.", status: status.statusCode)
-                            default : self.enalogLog("Enalog Ingest Error: \(object?.detail ?? "Unknown")", status: status.statusCode)
+                    let payload = try JSONEncoder().encode(object)
+                    
+                    var request = URLRequest(url: endpoint, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 60)
+                    request.httpMethod = "POST"
+                    request.httpBody = payload
+                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.addValue("Bearer \(appkey)", forHTTPHeaderField: "Authorization")
+                    
+                    if self.debugger {
+                        print("\n\n✅ Enalog Client - Payload Sent:" ,String(decoding: payload, as: UTF8.self))
+                        
+                    }
+                    
+                    do {
+                        let (data, response) = try await URLSession.shared.data(for: request)
+                        let object = try? JSONDecoder().decode(EnalogResponse.self, from: data)
+                        
+                        if let status = response as? HTTPURLResponse {
+                            switch status.statusCode {
+                                case 200 : self.enalogLog("Enalog Ingest Stored", status: status.statusCode)
+                                case 401 : self.enalogLog("Enalog Authorization Error: API Key is Invalid", status: status.statusCode)
+                                case 404 : self.enalogLog("Enalog Project '\(self.project ?? "")' does not exist. This can be specified by setting the  'EN_PROJECT_NAME' value in the info.plist.", status: status.statusCode)
+                                default : self.enalogLog("Enalog Ingest Error: \(object?.detail ?? "Unknown")", status: status.statusCode)
+                                
+                            }
                             
                         }
                         
                     }
+                    catch {
+                        self.enalogLog("Enalog Ingest Error: \(error)", status: 500)
+                        
+                    }
+                    
+                    self.requests += 1
                     
                 }
                 catch {
-                    self.enalogLog("Enalog Ingest Error: \(error)", status: 500)
+                    self.enalogLog("Enalog Ingest Codable Error: \(error)", status: 500)
                     
                 }
                 
             }
-            catch {
-                self.enalogLog("Enalog Ingest Codable Error: \(error)", status: 500)
-
-            }
+            
+        }
+        else {
+            self.enalogLog("Enalog Ingest Error: Requests Throttled (\(self.requests)/\(self.throttle))", status: 429)
             
         }
         
@@ -236,6 +263,16 @@ public class EnalogManager {
             payload["Version"] = version
 
         }
+        
+        #if os(iOS)
+            payload["Architecture"] = "iOS"
+        #elseif os(tvOS)
+            payload["Architecture"] = "tvOS"
+        #elseif os(watchOS)
+            payload["Architecture"] = "watchOS"
+        #elseif os(macOS)
+            payload["Architecture"] = "macOS"
+        #endif
         
         payload["Theme"] = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
         
