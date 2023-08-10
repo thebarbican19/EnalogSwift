@@ -5,6 +5,12 @@ import PackageDescription
 
 let package = Package(
     name: "EnalogClient",
+    platforms: [
+            .macOS(.v10_13),  // macOS 10.13 (High Sierra)
+            .iOS(.v11),      // iOS 11 (Equivalent to macOS 10.13 release year)
+            .watchOS(.v4),   // watchOS 4 (Equivalent to macOS 10.13 release year)
+            .tvOS(.v11)      // tvOS 11 (Equivalent to macOS 10.13 release year)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
