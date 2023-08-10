@@ -282,7 +282,7 @@ public class EnalogManager {
         
     }
     
-    private func enaglogTagsMerge(_ tags: [String]) -> Array<EnalogEncodableValue> {
+    private func enaglogTagsMerge(_ tags: [String]?) -> Array<EnalogEncodableValue> {
         var combined: Array<EnalogEncodableValue> = []
 
         for (_, value) in self.enalogSystem() {
@@ -290,8 +290,11 @@ public class EnalogManager {
             
         }
         
-        for tag in tags {
-            combined.append(EnalogEncodableValue(tag))
+        if let tags = tags {
+            for tag in tags {
+                combined.append(EnalogEncodableValue(tag))
+                
+            }
             
         }
         
