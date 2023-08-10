@@ -155,11 +155,7 @@ public class EnalogManager {
         var payload = Dictionary<String, EnalogEncodableValue>()
         payload["name"] = EnalogEncodableValue(event.rawValue)
         payload["description"] = EnalogEncodableValue(description)
-        
-        if let tags = tags {
-            payload["tags"] = EnalogEncodableValue(self.enaglogTagsMerge(tags))
-            
-        }
+        payload["tags"] = EnalogEncodableValue(self.enaglogTagsMerge(tags))
         
         if let project = self.enalogProject {
             payload["project"] = EnalogEncodableValue(project)
@@ -345,6 +341,8 @@ public class EnalogManager {
         #endif
         
         payload["Theme"] = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+        
+        print("Tags: " ,payload)
         
         return payload
         
