@@ -91,6 +91,17 @@ EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was
 <p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production.</strong></p>
 <br/><br/>
 
+<h3>Version Support</h3>
+
+EnalogSwift runs on **all** Apple device architectures, including  VisionOS! <br/>
+ - MacOS **10.15+** (Silicon & Intel)<br/>
+ - iOS **13.0+**<br/>
+ - watchOS **6.0+**<br/>
+ - tvOS **13.0+**<br/>
+ - visionOS **1.0+**<br/>
+
+<br/><br/>
+
 <strong>Enalog</strong> also has official Libraries in <a href="https://docs.enalog.app/packages/python">Python</a> <a href="https://docs.enalog.app/packages/node-js">Node.js</a> & <a href="https://docs.enalog.app/packages/go">Go</a>. For more information, visit the <a href="https://docs.enalog.app/">official documentation</a>.
 
 
