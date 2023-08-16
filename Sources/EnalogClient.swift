@@ -324,22 +324,7 @@ public class EnalogManager {
             
         }
         
-        let unmuted = payload
-        
-        if #available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, visionOS 1.0, *) {
-            Task(priority: .background) {
-                await self.enalogCallback(object: unmuted)
-                
-            }
-            
-        }
-        else {
-            let version = ProcessInfo.processInfo.operatingSystemVersion
-            let formatted = "\(version.majorVersion).\(version.minorVersion)"
-            
-            self.enalogLog("This system version (\(formatted)) is not supported.", status: 501)
-            
-        }
+        self.enalogCallback(object: payload)
         
     }
 
@@ -361,8 +346,7 @@ public class EnalogManager {
         
     }
     
-    @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, visionOS 1.0, *)
-    private func enalogCallback(object:Dictionary<String,EnalogEncodableValue>) async {
+    private func enalogRequestBuild(object:Dictionary<String,EnalogEncodableValue>) -> URLRequest? {
         if self.requests < self.throttle {
             if let endpoint = URL(string: "https://api.enalog.app/v1/events"), let appkey = EnalogManager.key {
                 do {
@@ -379,35 +363,7 @@ public class EnalogManager {
                         
                     }
                     
-                    do {
-                        let (data, response) = try await URLSession.shared.data(for: request)
-                        let object = try? JSONDecoder().decode(EnalogResponse.self, from: data)
-                        
-                        if let status = response as? HTTPURLResponse {
-                            switch status.statusCode {
-                            case 200 : self.enalogLog("Enalog Ingest Stored", status: status.statusCode)
-                            case 401 : self.enalogLog("Enalog Authorization Error: API Key is Invalid", status: status.statusCode)
-                            case 404 : self.enalogLog("Enalog Project '\(self.project ?? "")' does not exist. This can be specified by setting the  'EN_PROJECT_NAME' value in the info.plist.", status: status.statusCode)
-                            default : self.enalogLog("Enalog Ingest Error: \(object?.message ?? "Unknown")", status: status.statusCode)
-                                
-                            }
-                            
-                            if let enviroment = object?.enviroment {
-                                self.enviroment = enviroment
-
-                            }
-                            
-                            UserDefaults.standard.removeObject(forKey: "enalog.ingest.crash")
-                                                        
-                        }
-                        
-                    }
-                    catch {
-                        self.enalogLog("Enalog Ingest Error: \(error)", status: 500)
-                        
-                    }
-                    
-                    self.requests += 1
+                    return request
                     
                 }
                 catch {
@@ -421,6 +377,49 @@ public class EnalogManager {
         else {
             self.enalogLog("Enalog Ingest Error: Requests Throttled (\(self.requests)/\(self.throttle))", status: 429)
             
+        }
+        
+        return nil
+        
+    }
+
+    private func enalogCallback(object:Dictionary<String,EnalogEncodableValue>)  {
+        do {
+            if let request = self.enalogRequestBuild(object: object) {
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    guard let data = data else {
+                        return
+                        
+                    }
+                    
+                    let object = try? JSONDecoder().decode(EnalogResponse.self, from: data)
+                    
+                    if let status = response as? HTTPURLResponse {
+                        switch status.statusCode {
+                        case 200 : self.enalogLog("Enalog Ingest Stored", status: status.statusCode)
+                        case 401 : self.enalogLog("Enalog Authorization Error: API Key is Invalid", status: status.statusCode)
+                        case 404 : self.enalogLog("Enalog Project '\(self.project ?? "")' does not exist. This can be specified by setting the  'EN_PROJECT_NAME' value in the info.plist.", status: status.statusCode)
+                        default : self.enalogLog("Enalog Ingest Error: \(object?.message ?? "Unknown")", status: status.statusCode)
+                            
+                        }
+                        
+                        if let enviroment = object?.enviroment {
+                            self.enviroment = enviroment
+                            
+                        }
+                        
+                        UserDefaults.standard.removeObject(forKey: "enalog.ingest.crash")
+                        
+                    }
+                    
+                    self.requests += 1
+                    
+                }
+                
+                task.resume()
+                
+            }
+                        
         }
         
     }
