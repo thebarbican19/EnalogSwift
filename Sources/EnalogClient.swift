@@ -6,6 +6,10 @@
 
 import Foundation
 
+public enum EnalogInternalEvents:String {
+    case fatalError = "fatal.error"
+}
+
 public struct EnalogCrashObject:Codable {
     var name:String
     var reason:String?
@@ -221,7 +225,13 @@ public class EnalogManager {
         
     }
     
-    public func ingest<T: RawRepresentable>(_ event: T, description: String, metadata: AnyObject? = nil, tags: [String]? = nil) where T.RawValue == String {
+    public func ingest<T: RawRepresentable>(_ event: T?, description: String, metadata: AnyObject? = nil, tags: [String]? = nil) where T.RawValue == String {
+        guard let event = event else {
+            self.enalogLog("Event type does not exist", status: 422)
+            return
+
+        }
+        
         var payload = Dictionary<String, EnalogEncodableValue>()
         payload["name"] = EnalogEncodableValue(event.rawValue)
         payload["description"] = EnalogEncodableValue(description)
@@ -442,10 +452,11 @@ public class EnalogManager {
         if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash") {
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
                 
-                self.ingest(.init(rawValue: "fatal.error"), description: "A Crash was Detected")
+                self.ingest(EnalogInternalEvents.fatalError, description: "A Crash was Detected")
+                
             }
             
-            self.ingest(.init(rawValue: "fatal.error"), description: "!A Crash was Detected")
+            self.ingest(EnalogInternalEvents.fatalError, description: "!A Crash was Detected")
             
         }
         
