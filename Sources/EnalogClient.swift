@@ -207,6 +207,8 @@ public class EnalogManager {
             
             NSSetUncaughtExceptionHandler(enalogCrash)
             
+            self.engalogPending()
+
         }
         
     }
@@ -251,6 +253,8 @@ public class EnalogManager {
             }
             
         }
+        
+        self.engalogPending()
         
     }
     
