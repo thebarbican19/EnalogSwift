@@ -492,10 +492,16 @@ public class EnalogManager {
     
     private func engalogPending() {
         if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash"), let event = self.crash {
+            print("Enalog Crash Report Found")
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
-                                
+                print("Enalog Crash DECODED" ,object)
+
                 self.ingest(event.event, description: "A Crash was Detected", metadata: object, channel: self.crash?.channel)
                 
+            }
+            else {
+                print("Enalog Crash NOT DECODED")
+
             }
                         
         }
