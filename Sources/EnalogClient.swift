@@ -6,6 +6,20 @@
 
 import Foundation
 
+public struct EnalogCrashObject:Codable {
+    var name:String
+    var reason:String?
+    var trace:[String]
+   
+    init(_ exception:NSException) {
+        self.name = exception.name.rawValue
+        self.reason = exception.reason
+        self.trace = exception.callStackSymbols
+    
+    }
+    
+}
+
 public enum EnalogDeviceType:String,Codable {
     case macbook
     case macbookPro
@@ -151,6 +165,9 @@ public class EnalogManager {
             self.requests = 0
             
         }
+        
+        NSSetUncaughtExceptionHandler(enalogCrash)
+    
         
     }
     
@@ -501,4 +518,19 @@ public class EnalogManager {
                 
     }
     
+}
+
+public func enalogCrash(exception: NSException) {
+    let object:EnalogCrashObject = .init(exception)
+    
+    if let encoded = try? JSONEncoder().encode(object) {
+        print("Enalog Save Crash: " ,String(decoding: encoded, as: UTF8.self))
+
+        UserDefaults.standard.set(String(decoding: encoded, as: UTF8.self), forKey: "enalog.ingest.crash")
+        UserDefaults().synchronize()
+
+    }
+    
+    abort()
+
 }
