@@ -57,6 +57,7 @@ Creating & Tracking events can be achieved by calling the <code>EnalogManager.ma
 <li><strong>Description</strong> (String)</li>
 <li><strong>Tags</strong> (Array<String>)</li>
 <li><strong>Metadata</strong> (AnyObject)</li>
+<li><strong>Channel</strong> (EnalogChannelObject)</li>
 
 <br/><br/>
 First, you must create an <strong>Enum</strong> with all your Event ID's. This can be named anything. 
@@ -85,6 +86,16 @@ struct PurchaseEvent:Codable {
 let product:PurchaseEvent = .init(product:"SprintDock License", cost:95.00)
 
 EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was purchased", metadata:product)</pre>
+
+<br/><br/>
+<h3>Crash Logging</h3>
+<strong>EnalogSwift can also notify you of crashes in your App.</strong> When enabled, additional metadata is sent which includes the reason.
+<br><br>
+To enable crash logging, you call the <code>crash</code>. This takes an <code>enum</code> just like the <code>ingest</code> function. <br><br>
+<pre>
+EnalogManager.main.crash(EnalogEvents.fatalError)
+EnalogManager.main.crash(EnalogEvents.fatalError, channel: .init(.slack, id:"MY CHANNEL"))
+</pre>
 
 <br/><br/>
 <h3>Throttling</h3>
