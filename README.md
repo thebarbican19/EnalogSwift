@@ -1,4 +1,13 @@
 <h1>EnalogSwift</h1>
+
+[![Swift Version](https://img.shields.io/badge/Swift-5.x-orange.svg)]()
+[![MacOS Support](https://img.shields.io/badge/MacOS-10.14+-green)]()
+[![iOS Support](https://img.shields.io/badge/iOS-11.0+-green)]()
+[![tvOS Support](https://img.shields.io/badge/tvOS-11.0+-green)]()
+[![watchOS Support](https://img.shields.io/badge/watchOS-4.0+-green)]()
+[![visionOS Support](https://img.shields.io/badge/visionOS-1.0+-green)]()
+
+
 Enalog for Swift is the Unofficial Swift Package made by <a href="https://twitter.com/mistermeenr">Joe Barbour</a> in collaboration with <a href="https://enalog.app/">Enalog & Enteka Software</a>.
 
 <br/><br/>
@@ -87,8 +96,10 @@ EnalogManager.main.ingest(EnalogEvents.purchaseEvent, description:"A product was
 
 <br/><br/>
 <h3>Logging & Debugging</h3>
-<p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
+<p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> 
+<code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
 <p></p>For additional granularity, you can pass <strong>.fatal</strong> <code>EnalogManager.main.debug(true, logType:.fatal)</code>. This will call a <strong>FatalError</strong> exception whenever an error occurs.</p><p></p><strong>This should not be used in Production.</strong></p>
+<p>Debug is automatically enabled when running in Xcode.</p>
 <br/><br/>
 
 <h3>Version Support</h3>
