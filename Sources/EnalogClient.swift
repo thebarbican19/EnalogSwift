@@ -168,6 +168,7 @@ public class EnalogManager {
         
         NSSetUncaughtExceptionHandler(enalogCrash)
     
+        self.engalogPending()
         
     }
     
@@ -437,6 +438,19 @@ public class EnalogManager {
         
     }
     
+    private func engalogPending() {
+        if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash") {
+            if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
+                
+                self.ingest(.init(rawValue: "fatal.error"), description: "A Crash was Detected")
+            }
+            
+            self.ingest(.init(rawValue: "fatal.error"), description: "!A Crash was Detected")
+            
+        }
+        
+    }
+    
     private func enalogLog(_ text:String, status:Int) {
         if self.debugger {
             if status == 200 || status == 201 {
@@ -524,13 +538,14 @@ public func enalogCrash(exception: NSException) {
     let object:EnalogCrashObject = .init(exception)
     
     if let encoded = try? JSONEncoder().encode(object) {
-        print("Enalog Save Crash: " ,String(decoding: encoded, as: UTF8.self))
-
         UserDefaults.standard.set(String(decoding: encoded, as: UTF8.self), forKey: "enalog.ingest.crash")
         UserDefaults().synchronize()
 
     }
     
-    abort()
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        abort()
+        
+    }
 
 }
