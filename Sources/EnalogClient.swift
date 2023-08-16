@@ -12,10 +12,10 @@ public enum EnalogChannelType:String {
 }
 
 public struct EnalogChannelObject {
-    var type:EnalogChannelType
-    var id:String
+    public var type:EnalogChannelType
+    public var id:String
     
-    init(_ type: EnalogChannelType, id: String) {
+    public init(_ type: EnalogChannelType, id: String) {
         self.type = type
         self.id = id
         
