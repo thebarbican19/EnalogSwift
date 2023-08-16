@@ -32,13 +32,10 @@ public struct EnalogCrashEvent:Codable {
 public struct EnalogCrashObject:Codable {
     var name:String
     var reason:String?
-    var trace:[String]
    
     init(_ exception:NSException) {
         self.name = exception.name.rawValue
         self.reason = exception.reason
-        //self.trace = exception.callStackSymbols
-        self.trace = []
         
     }
     
@@ -301,8 +298,8 @@ public class EnalogManager {
                 let convert = try JSONEncoder().encode(metadata)
                 let object = try JSONSerialization.jsonObject(with: convert, options: [])
                 
-                if let metadata = object as? Dictionary<String,Encodable> {
-                    payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(metadata))
+                if let dictionary = object as? [String: Encodable] {
+                    payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(dictionary))
                     
                 }
                 else {
