@@ -306,6 +306,7 @@ public class EnalogManager {
                     
                 }
                 else {
+                    print("CODABLE OBJECTY" ,object)
                     self.enalogLog("Metadata does not conform to the Codable Protocol", status: 400)
                     
                 }
