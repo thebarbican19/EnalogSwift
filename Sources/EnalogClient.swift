@@ -6,12 +6,12 @@
 
 import Foundation
 
-public enum EnalogChannelType:String {
+public enum EnalogChannelType:String,Codable {
     case slack
     
 }
 
-public struct EnalogChannelObject {
+public struct EnalogChannelObject:Codable {
     public var type:EnalogChannelType
     public var id:String
     
@@ -23,9 +23,9 @@ public struct EnalogChannelObject {
     
 }
 
-public struct EnalogCrashEvent {
+public struct EnalogCrashEvent:Codable {
     var event:String
-    var channel:String?
+    var channel:EnalogChannelObject?
     
 }
 
@@ -38,7 +38,7 @@ public struct EnalogCrashObject:Codable {
         self.name = exception.name.rawValue
         self.reason = exception.reason
         self.trace = exception.callStackSymbols
-    
+        
     }
     
 }
@@ -81,12 +81,12 @@ public enum EnalogSystemName:String,Codable {
     
     var name:String {
         switch self {
-            case .mojave : return "MacOS Mojave"
-            case .catalina : return "MacOS Catalina"
-            case .bigsur : return "MacOS Big Sur"
-            case .monterey : return "MacOS Monterey"
-            case .ventura : return "MacOS Ventura"
-            case .sonoma : return "MacOS Sonoma"
+            case .mojave : return "Mojave"
+            case .catalina : return "Catalina"
+            case .bigsur : return "Big Sur"
+            case .monterey : return "Monterey"
+            case .ventura : return "Ventura"
+            case .sonoma : return "Sonoma"
             default : return "Unknown"
             
         }
@@ -200,7 +200,7 @@ public class EnalogManager {
         
     }
     
-    public func crash<T: RawRepresentable>(_ event: T, channel:String? = nil) {
+    public func crash<T: RawRepresentable>(_ event: T, channel:EnalogChannelObject? = nil) {
         if let event = event.rawValue as? String {
             self.crash = .init(event: event, channel: channel)
             
@@ -264,7 +264,7 @@ public class EnalogManager {
     
     }
     
-    private func ingest(_ event: String, description: String, metadata: AnyObject? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil)  {
+    private func ingest(_ event: String, description: String, metadata: Any? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil)  {
         var payload = Dictionary<String, EnalogEncodableValue>()
         payload["name"] = EnalogEncodableValue(event)
         payload["description"] = EnalogEncodableValue(description)
@@ -492,8 +492,8 @@ public class EnalogManager {
     private func engalogPending() {
         if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash"), let event = self.crash {
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
-                
-                self.ingest(event.event, description: "A Crash was Detected")
+                                
+                self.ingest(event.event, description: "A Crash was Detected", metadata: object, channel: self.crash?.channel)
                 
             }
                         
