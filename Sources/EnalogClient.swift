@@ -181,7 +181,7 @@ public class EnalogManager {
     private var throttle:Int = 10
     private var crash:EnalogCrashEvent?
 
-    public var debugger:Bool = false
+    public var debugger:Bool? = nil
     public var user = Dictionary<String,Encodable>()
     public var enviroment:EnalogEnviroment = .production
     
@@ -190,9 +190,12 @@ public class EnalogManager {
             self.requests = 0
             
         }
+                
+        #if DEBUG
+            self.debug(true)
         
-        self.engalogPending()
-        
+        #endif
+
     }
     
     public func debug(_ enabled:Bool, logType:EnalogErrors = .log) {
@@ -258,7 +261,7 @@ public class EnalogManager {
         
     }
     
-    public func ingest<T: RawRepresentable>(_ event: T?, description: String, metadata: AnyObject? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil) where T.RawValue == String {
+    public func ingest<T: RawRepresentable>(_ event: T?, description: String, metadata: Codable? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil) where T.RawValue == String {
         guard let event = event?.rawValue as? String else {
             self.enalogLog("Event type does not exist", status: 422)
             return
@@ -269,7 +272,7 @@ public class EnalogManager {
     
     }
     
-    private func ingest(_ event: String, description: String, metadata: Any? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil)  {
+    private func ingest(_ event: String, description: String, metadata: Codable? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil)  {
         var payload = Dictionary<String, EnalogEncodableValue>()
         payload["name"] = EnalogEncodableValue(event)
         payload["description"] = EnalogEncodableValue(description)
@@ -294,12 +297,21 @@ public class EnalogManager {
         }
         
         if let metadata = metadata {
-            if let metadata = metadata as? Dictionary<String,Encodable> {
-                payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(metadata))
+            do {
+                let convert = try JSONEncoder().encode(metadata)
+                let object = try JSONSerialization.jsonObject(with: convert, options: [])
+                
+                if let metadata = object as? Dictionary<String,Encodable> {
+                    payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(metadata))
+                    
+                }
+                else {
+                    self.enalogLog("Metadata does not conform to the Codable Protocol", status: 400)
+                    
+                }
                 
             }
-            else {
-                self.enalogLog("Metadata does not conform to the Codable Protocol", status: 400)
+            catch {
                 
             }
             
@@ -359,7 +371,7 @@ public class EnalogManager {
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
                     request.addValue("Bearer \(appkey)", forHTTPHeaderField: "Authorization")
                     
-                    if self.debugger {
+                    if self.debugger == true {
                         print("\n\n✅ Enalog Client - Payload Sent:" ,String(decoding: payload, as: UTF8.self))
                         
                     }
@@ -381,6 +393,8 @@ public class EnalogManager {
                                 self.enviroment = enviroment
 
                             }
+                            
+                            UserDefaults.standard.removeObject(forKey: "enalog.ingest.crash")
                                                         
                         }
                         
@@ -496,16 +510,12 @@ public class EnalogManager {
     
     private func engalogPending() {
         if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash"), let event = self.crash {
-            print("Enalog Crash Report Found")
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
-                print("Enalog Crash DECODED" ,object)
-
-                self.ingest(event.event, description: "A Crash was Detected", metadata: object, channel: self.crash?.channel)
                 
-            }
-            else {
-                print("Enalog Crash NOT DECODED")
-
+                self.ingest(event.event, description: "Crash Detected", metadata: object, channel: self.crash?.channel)
+                
+                self.enalogLog("Crash Previously Detected '\(object.name)'", status: 500)
+                
             }
                         
         }
@@ -513,7 +523,7 @@ public class EnalogManager {
     }
     
     private func enalogLog(_ text:String, status:Int) {
-        if self.debugger {
+        if self.debugger == true {
             if status == 200 || status == 201 {
                 print("\n\n✅ Enalog Client \(self.enviroment.testing ? "Testing":"") - \(text)\n\n")
     
