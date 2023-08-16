@@ -6,8 +6,27 @@
 
 import Foundation
 
-public enum EnalogInternalEvents:String {
-    case fatalError = "fatal.error"
+public enum EnalogChannelType:String {
+    case slack
+    
+}
+
+public struct EnalogChannelObject {
+    var type:EnalogChannelType
+    var id:String
+    
+    init(_ type: EnalogChannelType, id: String) {
+        self.type = type
+        self.id = id
+        
+    }
+    
+}
+
+public struct EnalogCrashEvent {
+    var event:String
+    var channel:String?
+    
 }
 
 public struct EnalogCrashObject:Codable {
@@ -159,7 +178,8 @@ public class EnalogManager {
     private var project:String?
     private var requests:Int = 0
     private var throttle:Int = 10
-    
+    private var crash:EnalogCrashEvent?
+
     public var debugger:Bool = false
     public var user = Dictionary<String,Encodable>()
     public var enviroment:EnalogEnviroment = .production
@@ -170,8 +190,6 @@ public class EnalogManager {
             
         }
         
-        NSSetUncaughtExceptionHandler(enalogCrash)
-    
         self.engalogPending()
         
     }
@@ -179,6 +197,16 @@ public class EnalogManager {
     public func debug(_ enabled:Bool, logType:EnalogErrors = .log) {
         self.debugger = enabled
         self.fatal = logType
+        
+    }
+    
+    public func crash<T: RawRepresentable>(_ event: T, channel:String? = nil) {
+        if let event = event.rawValue as? String {
+            self.crash = .init(event: event, channel: channel)
+            
+            NSSetUncaughtExceptionHandler(enalogCrash)
+            
+        }
         
     }
 
@@ -225,15 +253,20 @@ public class EnalogManager {
         
     }
     
-    public func ingest<T: RawRepresentable>(_ event: T?, description: String, metadata: AnyObject? = nil, tags: [String]? = nil) where T.RawValue == String {
-        guard let event = event else {
+    public func ingest<T: RawRepresentable>(_ event: T?, description: String, metadata: AnyObject? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil) where T.RawValue == String {
+        guard let event = event?.rawValue as? String else {
             self.enalogLog("Event type does not exist", status: 422)
             return
 
         }
         
+        self.ingest(event, description: description, metadata: metadata, tags: tags, channel: channel)
+    
+    }
+    
+    private func ingest(_ event: String, description: String, metadata: AnyObject? = nil, tags: [String]? = nil, channel:EnalogChannelObject? = nil)  {
         var payload = Dictionary<String, EnalogEncodableValue>()
-        payload["name"] = EnalogEncodableValue(event.rawValue)
+        payload["name"] = EnalogEncodableValue(event)
         payload["description"] = EnalogEncodableValue(description)
         payload["tags"] = EnalogEncodableValue(self.enaglogTagsMerge(tags))
         
@@ -244,6 +277,14 @@ public class EnalogManager {
         
         if let user = self.user["UserID"] {
             payload["user_id"] = EnalogEncodableValue(user)
+            
+        }
+        
+        if let channel = channel {
+            var object: [String: EnalogEncodableValue] = [:]
+            object[channel.type.rawValue] = EnalogEncodableValue(channel.id)
+
+            payload["channels"] = EnalogEncodableValue(channel as! Encodable)
             
         }
         
@@ -281,7 +322,7 @@ public class EnalogManager {
         }
         
     }
-    
+
     private var enalogProject:String? {
         if let project = Bundle.main.infoDictionary?["EN_PROJECT_NAME"] as? String  {
             return project.lowercased()
@@ -449,15 +490,13 @@ public class EnalogManager {
     }
     
     private func engalogPending() {
-        if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash") {
+        if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash"), let event = self.crash {
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
                 
-                self.ingest(EnalogInternalEvents.fatalError, description: "A Crash was Detected")
+                self.ingest(event.event, description: "A Crash was Detected")
                 
             }
-            
-            self.ingest(EnalogInternalEvents.fatalError, description: "!A Crash was Detected")
-            
+                        
         }
         
     }
