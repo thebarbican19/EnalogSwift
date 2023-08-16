@@ -37,7 +37,8 @@ public struct EnalogCrashObject:Codable {
     init(_ exception:NSException) {
         self.name = exception.name.rawValue
         self.reason = exception.reason
-        self.trace = exception.callStackSymbols
+        //self.trace = exception.callStackSymbols
+        self.trace = []
         
     }
     
