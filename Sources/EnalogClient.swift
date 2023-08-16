@@ -312,7 +312,8 @@ public class EnalogManager {
                 
             }
             catch {
-                
+                self.enalogLog("Metadata Encoding Error '\(error.localizedDescription)'", status: 400)
+
             }
             
         }
