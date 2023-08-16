@@ -284,7 +284,7 @@ public class EnalogManager {
             var object: [String: EnalogEncodableValue] = [:]
             object[channel.type.rawValue] = EnalogEncodableValue(channel.id)
 
-            payload["channels"] = EnalogEncodableValue(channel as! Encodable)
+            payload["channels"] = EnalogEncodableValue(object)
             
         }
         
