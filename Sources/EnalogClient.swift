@@ -298,7 +298,7 @@ public class EnalogManager {
                 let convert = try JSONEncoder().encode(metadata)
                 let object = try JSONSerialization.jsonObject(with: convert, options: [])
                 
-                if let dictionary = object as? [String: Encodable] {
+                if let dictionary = object as? [String: Codable] {
                     payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(dictionary))
                     
                 }
