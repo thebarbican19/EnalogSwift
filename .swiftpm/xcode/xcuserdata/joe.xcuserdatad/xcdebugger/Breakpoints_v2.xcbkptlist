@@ -30,8 +30,8 @@
             filePath = "Sources/EnalogClient.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "307"
-            endingLineNumber = "307"
+            startingLineNumber = "311"
+            endingLineNumber = "311"
             landmarkName = "ingest(_:description:metadata:tags:channel:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Sources/EnalogClient.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
+            startingLineNumber = "317"
+            endingLineNumber = "317"
             landmarkName = "ingest(_:description:metadata:tags:channel:)"
             landmarkType = "7">
          </BreakpointContent>

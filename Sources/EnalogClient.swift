@@ -302,6 +302,10 @@ public class EnalogManager {
                     payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(dictionary))
                     
                 }
+                else if let dictionary = object as? [String: Codable] {
+                    payload["meta"] = EnalogEncodableValue(self.enaglogMetadataMerge(dictionary))
+                    
+                }
                 else {
                     print("CODABLE OBJECTY" ,object)
                     self.enalogLog("Metadata does not conform to the Codable Protocol", status: 400)
