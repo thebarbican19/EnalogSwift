@@ -514,7 +514,7 @@ public class EnalogManager {
         if let report = UserDefaults.standard.string(forKey: "enalog.ingest.crash"), let event = self.crash {
             if let object = try? JSONDecoder().decode(EnalogCrashObject.self, from: Data(report.utf8)) {
                 
-                self.ingest(event.event, description: "Crash Detected", metadata: object, channel: self.crash?.channel)
+                self.ingest(event.event, description: "Crash Detected \(object.name)", metadata: object, channel: self.crash?.channel)
                 
                 self.enalogLog("Crash Previously Detected '\(object.name)'", status: 500)
                 

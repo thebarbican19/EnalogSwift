@@ -7,6 +7,16 @@
 		<key>EnalogClient.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>EnalogSwift-Package.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>EnalogSwift.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
 	</dict>
@@ -18,6 +28,11 @@
 			<true/>
 		</dict>
 		<key>EnalogClientTests</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>EnalogSwift</key>
 		<dict>
 			<key>primary</key>
 			<true/>
