@@ -124,6 +124,6 @@ EnalogSwift runs on **all** Apple device architectures, including  VisionOS! <br
 
 <br/><br/>
 
-<strong>Enalog</strong> also has official Libraries in <a href="https://docs.enalog.app/packages/python">Python</a> <a href="https://docs.enalog.app/packages/node-js">Node.js</a> & <a href="https://docs.enalog.app/packages/go">Go</a>. For more information, visit the <a href="https://docs.enalog.app/">official documentation</a>.
+<strong>Enalog</strong> also has official Libraries in <a href="https://enalog.app/docs/sdks/python/">Python</a> <a href="https://enalog.app/docs/sdks/node-js/">Node.js</a> & <a href="https://enalog.app/docs/sdks/go/">Go</a>. For more information, visit the <a href="https://enalog.app/docs/">official documentation</a>.
 
 
