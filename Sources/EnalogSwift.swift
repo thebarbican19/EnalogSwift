@@ -115,15 +115,28 @@ public enum EnalogErrors {
     
 }
 
+public struct EnalogResponseDetails:Decodable {
+    var msg:String
+    var type:String
+    
+}
+
 public struct EnalogResponse:Decodable {
     var message:String?
+    var details:[EnalogResponseDetails]
     var enviroment:EnalogEnviroment?
         
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.message = try! values.decode(String.self, forKey: .message)
+        self.message = try? values.decode(String.self, forKey: .message)
         self.enviroment = .production
+        self.details = []
+        
+        if let details = try? values.decode([EnalogResponseDetails].self, forKey: .detail) {
+            self.details = details
+            
+        }
         
         if let test = try? values.decode(Bool.self, forKey: .test) {
             if test == true {
@@ -138,6 +151,7 @@ public struct EnalogResponse:Decodable {
     public enum CodingKeys: String, CodingKey {
         case message
         case test
+        case detail
 
     }
     
