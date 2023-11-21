@@ -559,24 +559,27 @@ public class EnalogManager {
     }
     
     private var enalogDeviceType:EnalogDeviceType {
-        let platform = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        #if os(macOS)
+            let platform = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
-        if let model = IORegistryEntryCreateCFProperty(platform, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
-            if let type = String(data: model, encoding: .utf8)?.cString(using: .utf8) {
-                if String(cString: type).lowercased().contains("macbookpro") { return .macbookPro }
-                else if String(cString: type).lowercased().contains("macbookair") { return .macbookAir }
-                else if String(cString: type).lowercased().contains("macbook") { return .macbook }
-                else if String(cString: type).lowercased().contains("imac") { return .imac }
-                else if String(cString: type).lowercased().contains("macmini") { return .macMini }
-                else if String(cString: type).lowercased().contains("macstudio") { return .macStudio }
-                else if String(cString: type).lowercased().contains("macpro") { return .macPro }
-                else { return .unknown }
+            if let model = IORegistryEntryCreateCFProperty(platform, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
+                if let type = String(data: model, encoding: .utf8)?.cString(using: .utf8) {
+                    if String(cString: type).lowercased().contains("macbookpro") { return .macbookPro }
+                    else if String(cString: type).lowercased().contains("macbookair") { return .macbookAir }
+                    else if String(cString: type).lowercased().contains("macbook") { return .macbook }
+                    else if String(cString: type).lowercased().contains("imac") { return .imac }
+                    else if String(cString: type).lowercased().contains("macmini") { return .macMini }
+                    else if String(cString: type).lowercased().contains("macstudio") { return .macStudio }
+                    else if String(cString: type).lowercased().contains("macpro") { return .macPro }
+                    else { return .unknown }
+                    
+                }
                 
             }
-            
-        }
 
-        IOObjectRelease(platform)
+            IOObjectRelease(platform)
+        
+        #endif
         
         return .unknown
         
