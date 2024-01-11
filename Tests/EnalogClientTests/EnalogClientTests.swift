@@ -1,5 +1,5 @@
 import XCTest
-@testable import EnalogClient
+@testable import EnalogSwift
 
 final class EnalogClientTests: XCTestCase {
     

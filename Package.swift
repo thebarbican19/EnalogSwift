@@ -18,6 +18,8 @@ let package = Package(
             targets: ["EnalogSwift"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/andrealufino/Deviice", from: "2.1.2")
+
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
