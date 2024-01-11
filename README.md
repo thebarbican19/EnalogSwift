@@ -106,6 +106,11 @@ EnalogManager.main.crash(EnalogEvents.fatalError, channel: .init(.slack, id:"MY 
 <strong>This limit is capped at 20 ingest requests per second.</strong>
 
 <br/><br/>
+<h3>Disabling</h3>
+<p>You can **turn off all event tracking** if you are running in a debug environment or running tests manually.</p>
+<code>EnalogManager.main.disable(true)</code>
+
+<br/><br/>
 <h3>Logging & Debugging</h3>
 <p>Logging & Debugging are available in EnalogSwift. This can be toggled on and off at any point by calling</p> 
 <code>EnalogManager.main.debug(true)</code><p></p>By default, this will output all logs in the Xcode console.</p>
