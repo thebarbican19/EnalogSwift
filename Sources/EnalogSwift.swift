@@ -6,6 +6,12 @@
 
 import Foundation
 
+#if os(macOS)
+    import Cocoa
+#else
+    import UIKit
+#endif
+
 public enum EnalogDeviceInformationTypes {
     case model
     case os
