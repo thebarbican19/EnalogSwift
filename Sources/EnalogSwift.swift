@@ -50,12 +50,12 @@ public struct EnalogCrashObject:Codable {
 }
 
 public enum EnalogArchitectureType:String,Codable {
-    case iOS
-    case watchOS
-    case macSilicon
-    case macIntel
-    case visionOS
-    case tvOS
+    case iOS = "iOS"
+    case watchOS = "WatchOS"
+    case macSilicon = "MacOS (Silicon)"
+    case macIntel = "MacOS (Intel)"
+    case visionOS = "VisionOS"
+    case tvOS = "tvOS"
     
 }
 
