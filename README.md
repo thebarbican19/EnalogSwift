@@ -107,7 +107,7 @@ EnalogManager.main.crash(EnalogEvents.fatalError, channel: .init(.slack, id:"MY 
 
 <br/><br/>
 <h3>Disabling</h3>
-<p>You can **turn off all event tracking** if you are running in a debug environment or running tests manually.</p>
+<p>You can turn off all event tracking if you are running in a debug environment or running tests manually.</p>
 <code>EnalogManager.main.disable(true)</code>
 
 <br/><br/>
