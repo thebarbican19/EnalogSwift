@@ -12,14 +12,6 @@ import Foundation
     import UIKit
 #endif
 
-public enum EnalogDeviceInformationTypes {
-    case model
-    case os
-    case type
-    case architecture
-    
-}
-
 public enum EnalogChannelType:String,Codable {
     case slack
     
@@ -55,13 +47,25 @@ public struct EnalogCrashObject:Codable {
     
 }
 
-public enum EnalogArchitectureType:String,Codable {
+public enum EnalogDeviceArchitectureType:String,Codable {
+    case silicon = "MacOS (Silicon)"
+    case intel = "MacOS (Intel)"
+    
+}
+
+public enum EnalogDeviceOpperatingSystemType:String,Codable {
     case iOS = "iOS"
     case watchOS = "WatchOS"
-    case macSilicon = "MacOS (Silicon)"
-    case macIntel = "MacOS (Intel)"
+    case macOS = "MacOS"
     case visionOS = "VisionOS"
     case tvOS = "tvOS"
+    
+}
+
+public struct EnalogDeviceVersionObject {
+    var os:EnalogDeviceOpperatingSystemType
+    var alias:String
+    var version:Float = Float(ProcessInfo().operatingSystemVersion.majorVersion)
     
 }
 
@@ -118,38 +122,37 @@ public enum EnalogDeviceType:String,Codable {
         
     }
     
-    static var os:String {
+    static var os:EnalogDeviceVersionObject? {
         #if os(macOS)
             switch ProcessInfo().operatingSystemVersion.majorVersion {
-                case 11 : return EnalogSystemName.bigsur.name
-                case 12 : return EnalogSystemName.monterey.name
-                case 13 : return EnalogSystemName.ventura.name
-                case 14 : return EnalogSystemName.sonoma.name
-
+                case 11 : return .init(os: .macOS, alias: EnalogSystemName.bigsur.name)
+                case 12 : return .init(os: .macOS, alias: EnalogSystemName.monterey.name)
+                case 13 : return .init(os: .macOS, alias: EnalogSystemName.ventura.name)
+                case 14 : return .init(os: .macOS, alias: EnalogSystemName.sonoma.name)
                 default :
                     switch ProcessInfo().operatingSystemVersion.minorVersion {
-                        case 16 : return EnalogSystemName.mojave.name
-                        case 17 : return EnalogSystemName.catalina.name
-                        default : return EnalogSystemName.unknown.name
+                        case 16 : return .init(os: .macOS, alias: EnalogSystemName.mojave.name, version: 10.16)
+                        case 17 : return .init(os: .macOS, alias: EnalogSystemName.catalina.name, version: 10.17)
+                        default : return nil
                         
                     }
                     
             }
 
         #elseif os(iOS)
-            return "iOS \(ProcessInfo().operatingSystemVersion.majorVersion)"
+            return .init(os: .iOS, alias: "iOS")
 
         #elseif os(watchOS)
-            return "watchOS \(ProcessInfo().operatingSystemVersion.majorVersion)"
+            return .init(os: .watchOS, alias: "watchOS")
 
         #elseif os(tvOS)
-            return "tvOS \(ProcessInfo().operatingSystemVersion.majorVersion)"
+            return .init(os: .tvOS, alias: "tvOS")
 
         #elseif os(visionOS)
-            return "visionOS \(ProcessInfo().operatingSystemVersion.majorVersion)"
+            return .init(os: .visionOS, alias: "visionOS")
 
         #else
-            return ""
+            return nil
 
         #endif
         
@@ -190,27 +193,19 @@ public enum EnalogDeviceType:String,Codable {
 
     }
     
-    static var architecture:EnalogArchitectureType {
-        #if os(iOS)
-            return .iOS
-        
-        #elseif os(tvOS)
-            return .tvOS
-        
-        #elseif os(watchOS)
-            return .watchOS
-        
-        #elseif os(visionOS)
-            return .visionOS
-        
-        #elseif os(macOS)
+    static var architecture:EnalogDeviceArchitectureType {
+        #if os(macOS)
             #if arch(arm64)
-                return .macSilicon
+                return .silicon
         
             #elseif arch(x86_64)
-                return .macIntel
+                return .intel
         
             #endif
+        
+        #else
+            return .silicon
+
         #endif
         
     }
@@ -324,7 +319,8 @@ public struct EnalogEncodableValue: Encodable {
 @available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, visionOS 1.0, *)
 public class EnalogManager {
     public static let main = EnalogManager()
-    
+    public static let info = EnalogInformation()
+
     public static var key:String? {
         if let appkey = Bundle.main.infoDictionary?["EN_API_KEY"] as? String  {
             return appkey
@@ -645,8 +641,12 @@ public class EnalogManager {
         
         payload["Architecture"] = EnalogDeviceType.architecture.rawValue
         payload["Model"] = EnalogDeviceType.model
-        payload["OS"] = EnalogDeviceType.os
         payload["Device"] = EnalogDeviceType.type.name
+        
+        if let os = EnalogDeviceType.os?.alias {
+            payload["OS"] = os
+
+        }
 
         if (UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light") == "Light" {
             payload["Theme"] = "Light Mode"
@@ -700,33 +700,31 @@ public class EnalogManager {
         
     }
     
-    private var enalogDeviceType:EnalogDeviceType {
-        #if os(macOS)
-            let platform = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
-
-            if let model = IORegistryEntryCreateCFProperty(platform, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
-                if let type = String(data: model, encoding: .utf8)?.cString(using: .utf8) {
-                    if String(cString: type).lowercased().contains("macbookpro") { return .macbookPro }
-                    else if String(cString: type).lowercased().contains("macbookair") { return .macbookAir }
-                    else if String(cString: type).lowercased().contains("macbook") { return .macbook }
-                    else if String(cString: type).lowercased().contains("imac") { return .imac }
-                    else if String(cString: type).lowercased().contains("macmini") { return .macMini }
-                    else if String(cString: type).lowercased().contains("macstudio") { return .macStudio }
-                    else if String(cString: type).lowercased().contains("macpro") { return .macPro }
-                    else { return .unknown }
-                    
-                }
-                
-            }
-
-            IOObjectRelease(platform)
+    
         
-        #endif
-        
-        return .unknown
+}
+
+public class EnalogInformation {
+    public var deviceType:EnalogDeviceType {
+        return EnalogDeviceType.type
         
     }
+    
+    public var deviceModel:String {
+        return EnalogDeviceType.model
         
+    }
+    
+    public var deviceOpperatingSystem:EnalogDeviceVersionObject? {
+        return EnalogDeviceType.os
+        
+    }
+    
+    public var deviceArchitecture:EnalogDeviceArchitectureType {
+        return EnalogDeviceType.architecture
+        
+    }
+    
 }
 
 public func enalogCrash(exception: NSException) {
